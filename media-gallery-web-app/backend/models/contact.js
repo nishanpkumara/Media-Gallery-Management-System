@@ -1,6 +1,4 @@
-const mongoose = require('mongoose');
-const { create } = require('node:domain');
-const { type } = require('node:os');
+import mongoose from 'mongoose';
 
 const contactSchema = new mongoose.Schema({
   name: String,
@@ -17,4 +15,5 @@ const contactSchema = new mongoose.Schema({
 });
 
 const Contact = mongoose.model('Contact', contactSchema);
-module.exports = Contact;
+
+export default Contact;

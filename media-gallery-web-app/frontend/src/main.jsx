@@ -3,7 +3,8 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 
-React.createRoot(document.getElementById('root')).render(
+// Remove "React." from the start
+createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
   </StrictMode>,

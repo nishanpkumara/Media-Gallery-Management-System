@@ -1,4 +1,5 @@
-const jwt = require("jsonwebtoken");
+// const jwt = require("jsonwebtoken");
+import jwt from jsonwebtoken;
 
 const auth = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
@@ -15,6 +16,9 @@ const auth = (req, res, next) => {
   }
 };
 
+const admin = (req, res, next) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ msg: 'Admin access denied' });
+  next();
+};
 
-
-module.exports = {auth, };
+module.exports = {auth, admin };
