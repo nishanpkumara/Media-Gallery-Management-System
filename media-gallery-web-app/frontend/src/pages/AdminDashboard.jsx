@@ -10,7 +10,7 @@ const AdminDashboard = () => {
       try {
         const response = await fetch('/api/admin/users', {
           headers: {
-            'x-auth-token': localStorage.getItem('token') // Requirement: Protected route [cite: 10]
+            'x-auth-token': localStorage.getItem('token')
           }
         });
         const data = await response.json();
@@ -23,7 +23,7 @@ const AdminDashboard = () => {
     fetchUsers();
   }, []);
 
-  // Soft-delete / Deactivate logic
+  // Deactivate user
   const toggleUserActive = async (userId) => {
     try {
       const response = await fetch(`/api/admin/users/toggle/${userId}`, {

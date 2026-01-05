@@ -77,6 +77,22 @@ const userLogin = async (req, res) => {
   } catch (error) {
     return res.status(500).json({message: 'Internal server error', error: error.message});
   }
-}
+};
 
-export {register, verifyOTP, userLogin};
+const deactivateUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    user.isActive = false;
+    await user.save();
+    res.status(200).json({ message: 'User deactivated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  };
+};
+
+
+export {register, verifyOTP, userLogin, deactivateUser};
