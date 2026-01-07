@@ -1,18 +1,21 @@
-import User from '../models/user.js';
+import User from '../models/user.model.js';
 import { sendOTPEmail } from '../utils/otp.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, role } = req.body;
   
-  // Generate 6-digit OTP
+  // generate 6-digit OTP
   const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-  const otpExpires = new Date(Date.now() + 10 * 60000); // 10 mins
+  const otpExpires = new Date(Date.now() + 10 * 60000); // 10 minutes from now
 
-  const user = new User({ 
-    name, email, password, 
-    otp: { code: otpCode, expiresAt: otpExpires },
+  const user = new User({
+    name, email, password, role: role || 'user',
+    otp: { 
+      code: otpCode, 
+      expiresAt: otpExpires 
+    },
     isActive: false //for soft delete
   });
 
@@ -28,8 +31,10 @@ const verifyOTP = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user || user.otp.code !== code || user.otp.expiresAt < Date.now()) {
-      return res.status(400).json({ msg: "Invalid or expired OTP" });
-    }
+      return res.status(400).json({
+        message: "Invalid or expired OTP"
+      });
+    };
 
     // Activate user and clear OTP
     user.isActive = true;
@@ -64,35 +69,40 @@ const userLogin = async (req, res) => {
       return res.status(404).json({message: 'User Not Found'});
     };
 
+    if (!loginUser.isActive) {
+      return res.status(401).json({ message: 'Please verify your OTP first' });
+    }
+
     //valiade password
-    const isMatch = bcrypt.compare(password, loginUser.password);
+    const isMatch = await bcrypt.compare(password, loginUser.password);
     
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid Password' });
     }
-    return res.status(200).json({
-      message: 'Login Successfull',
-      loginUser
+
+    const token = jwt.sign({
+      id: loginUser._id,
+      name: loginUser.name,
+      email: loginUser.email,
+      role: loginUser.role
+    }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: "1h" }
+    );
+
+    res.status(200).json({
+      message: 'Login Successful',
+      token,
+      loginUser: {
+        id: loginUser._id,
+        name: loginUser.name,
+        email: loginUser.email,
+        role: loginUser.role
+      }
     });
   } catch (error) {
     return res.status(500).json({message: 'Internal server error', error: error.message});
   }
 };
 
-const deactivateUser = async (req, res) => {
-  try {
-    const userId = req.params.id;
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    user.isActive = false;
-    await user.save();
-    res.status(200).json({ message: 'User deactivated successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error: error.message });
-  };
-};
-
-
-export {register, verifyOTP, userLogin, deactivateUser};
+export {register, verifyOTP, userLogin};

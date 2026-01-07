@@ -4,19 +4,20 @@ import bcrypt from 'bcrypt';
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    require: true,
+    required: true,
     trim: true
   },
   email: { 
     type: String,
-    reguire: true,
+    required: true,
     unique: true,
-    trim: true
-
+    trim: true,
+    lowercase: true
   },
   password: {
     type: String,
-    min: 8,
+    required: true,
+    minlength: 8,
   },
   role: { 
     type: String,
@@ -31,21 +32,19 @@ const userSchema = new mongoose.Schema({
     type: Boolean, 
     default: false 
   },
-});
+}, { timestamps: true });
 
 //hashing password
-userSchema.pre("save", async function (req, res) {
-  if (!this.isModified("password")){
-    return null;
-  }
+userSchema.pre("save", async function () {
+  if (!this.isModified("password"))return;
+
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
   } 
   catch (error) {
-    console.log(error);
+    throw error;
   }
-  
 });
 
 const User = mongoose.model("User", userSchema);
