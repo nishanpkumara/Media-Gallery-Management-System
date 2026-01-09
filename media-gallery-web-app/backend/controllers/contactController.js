@@ -66,11 +66,13 @@ const updateMessage = async(req, res) => {
 
 const deleteMessage = async (req, res) => {
     try {
-        const deleteContact = await Contact.findByIdAndDelete(req.params.id);
-        if(!deleteContact){
-            return res.status(404).json({message: 'Contact not found'});
+        const deleteMessage = await Contact.findById(req.params.id);
+        if(!deleteMessage){
+            return res.status(404).json({message: 'Message not found'});
         }
-        return res.status(200).json({message: 'Contact deleted successfully'});
+
+
+        return res.status(200).json({message: 'Message deleted successfully'});
     } catch (error) {
         res.status(500).json({message: 'Server error', error: error.message});
     }
