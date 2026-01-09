@@ -3,14 +3,13 @@ import React, { useState, useEffect } from 'react';
 const MediaGallery = () => {
   const [media, setMedia] = useState([]);
   const [search, setSearch] = useState('');
-  const [selected, setSelected] = useState([]); // For ZIP download [cite: 21]
+  const [selected, setSelected] = useState([]);
 
   const toggleSelect = (id) => {
     setSelected(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
 
   const handleZipDownload = async () => {
-    // Call the backend /api/media/zip with selected IDs [cite: 23]
     alert(`Downloading ${selected.length} items as ZIP`);
   };
 
