@@ -12,7 +12,6 @@ const getAllUsers = async (req, res) => {
     }
 };
 
-// PUT /api/admin/users/:id - Edit user profile/role
 const updateUserProfile = async (req, res) => {
     try {
         const { name, email, role } = req.body;

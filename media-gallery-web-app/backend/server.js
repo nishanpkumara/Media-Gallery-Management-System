@@ -19,7 +19,6 @@ app.use(express.json());
 
 // API Endpoints
 app.use('/api/contact', contactRoutes);
-app.use('/api/admin/contact', contactRoutes); //admin routes
 app.use('/api/auth', authRoutes); //workding fine
 app.use('/api/users', userRoutes); //working fine
 // app.use('/api/media', mediaRoutes);
